@@ -5,6 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
+/*
+ * TODO: output BMR and TDEE to GUI
+ */
+
 class tdeeCalculator{
     private static JTextField ageTextField;
     private static Checkbox maleCheckbox;
@@ -31,16 +35,52 @@ class tdeeCalculator{
         weight /= 2.205; 
 
         // Calculate BMR based on gender
-        if (isMale) {
+        if(isMale){
             bmr = (int) ((10 * weight) + (6.25 * heightInCm) - (5 * age) + 5);
-        } else if (isFemale) {
+        } else if (isFemale){
             bmr = (int) ((10 * weight) + (6.25 * heightInCm) - (5 * age) - 161);
         }
 
         return bmr; 
     }
 
-    private static int convertHeight(String height) {
+    public static int calculateTDEE(){
+        int tdee = 0;
+        int bmr = calculateBMR();
+
+        String selectedActivity = (String) activityLevelDropdown.getSelectedItem();
+
+        if(selectedActivity.equals("Sedentary (office job)")){
+            tdee = (int) (bmr * 1.2);
+        } else if(selectedActivity.equals("Light Exercise (1-2 days/weeks)")){
+            tdee = (int) (bmr * 1.375);
+        } else if(selectedActivity.equals("Moderate Exercise (3-5 days/weeks)")){
+            tdee = (int) (bmr * 1.55);
+        } else if(selectedActivity.equals("Heavy Exercise (6-7 days/weeks)")){
+            tdee = (int) (bmr * 1.725);
+        } else if(selectedActivity.equals("Athlete (2x per day)")){
+            tdee = (int) (bmr * 1.9);
+        } 
+        return tdee; 
+    }
+
+    public static int deficitOrSurplus(){
+        boolean cutting = cuttingCheckbox.getState();
+        boolean bulking = bulkingCheckbox.getState();
+
+        int kcals = 0;
+        int tdee = calculateTDEE(); 
+
+        if(cutting){
+            kcals = tdee - 500; 
+        } else if(bulking){
+            kcals = tdee + 500;
+        }
+
+        return kcals; 
+    }
+
+    private static int convertHeight(String height){
         // Convert height from format X'Y" to centimeters
         String[] parts = height.split("'");
         int feet = Integer.parseInt(parts[0]);
@@ -48,7 +88,7 @@ class tdeeCalculator{
         return (int) ((feet * 30.48) + (inches * 2.54));
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args){
 
         // create instance of JFrame
         JFrame frame = new JFrame("Tdee-Calculator");
@@ -155,8 +195,13 @@ class tdeeCalculator{
             @Override
             public void actionPerformed(ActionEvent e){
                 int bmr = calculateBMR();
+                int tdee = calculateTDEE();
+                int kcals = deficitOrSurplus();
 
+                // DEBUG
                 System.out.println(bmr);
+                System.out.println(tdee);
+                System.out.println(kcals);
             }
         });
 
