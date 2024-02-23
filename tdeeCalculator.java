@@ -1,9 +1,53 @@
 import java.io.*;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 class tdeeCalculator{
+    private static JTextField ageTextField;
+    private static Checkbox maleCheckbox;
+    private static Checkbox femaleCheckbox;
+    private static JTextField weightTextField;
+    private static JComboBox<String> heightDropdown;
+    private static JComboBox<String> activityLevelDropdown;
+    private static Checkbox cuttingCheckbox;
+    private static Checkbox bulkingCheckbox; 
+
+
+    public static int calculateBMR(){
+        int bmr = 0;
+
+        // Get values from text fields and checkboxes
+        int age = Integer.parseInt(ageTextField.getText());
+        double weight = Double.parseDouble(weightTextField.getText());
+        String selectedHeight = (String) heightDropdown.getSelectedItem();
+        double heightInCm = convertHeight(selectedHeight);
+        boolean isMale = maleCheckbox.getState();
+        boolean isFemale = femaleCheckbox.getState();
+
+        // convert weight to kg
+        weight /= 2.205; 
+
+        // Calculate BMR based on gender
+        if (isMale) {
+            bmr = (int) ((10 * weight) + (6.25 * heightInCm) - (5 * age) + 5);
+        } else if (isFemale) {
+            bmr = (int) ((10 * weight) + (6.25 * heightInCm) - (5 * age) - 161);
+        }
+
+        return bmr; 
+    }
+
+    private static int convertHeight(String height) {
+        // Convert height from format X'Y" to centimeters
+        String[] parts = height.split("'");
+        int feet = Integer.parseInt(parts[0]);
+        int inches = Integer.parseInt(parts[1].replace("\"", ""));
+        return (int) ((feet * 30.48) + (inches * 2.54));
+    }
+
     public static void main(String[] args) {
 
         // create instance of JFrame
@@ -20,7 +64,7 @@ class tdeeCalculator{
         frame.add(age);
 
         // age text field
-        JTextField ageTextField = new JTextField();
+        ageTextField = new JTextField();
         ageTextField.setBounds(220,75,60,30);
         frame.add(ageTextField);
 
@@ -36,14 +80,14 @@ class tdeeCalculator{
 
         // gender checkbox
         CheckboxGroup cbg = new CheckboxGroup();  
-        Checkbox maleCheckBox = new Checkbox("Male", cbg, false);
-        maleCheckBox.setBounds(200,125,50,30);
+        maleCheckbox = new Checkbox("Male", cbg, false);
+        maleCheckbox.setBounds(200,125,50,30);
 
-        Checkbox femaleCheckBox = new Checkbox("Female", cbg, false);
-        femaleCheckBox.setBounds(275,125,100,30);
+        femaleCheckbox = new Checkbox("Female", cbg, false);
+        femaleCheckbox.setBounds(275,125,100,30);
         
-        frame.add(maleCheckBox);
-        frame.add(femaleCheckBox);
+        frame.add(maleCheckbox);
+        frame.add(femaleCheckbox);
 
         // weight label
         JLabel weight = new JLabel("Weight:");
@@ -51,7 +95,7 @@ class tdeeCalculator{
         frame.add(weight);
 
         // weight text field
-        JTextField weightTextField = new JTextField();
+        weightTextField = new JTextField();
         weightTextField.setBounds(220, 175, 60, 30);
         frame.add(weightTextField);
 
@@ -66,7 +110,7 @@ class tdeeCalculator{
         frame.add(height);
 
         // height comboBox
-        JComboBox<String> heightDropdown = new JComboBox<>(new String[] { "4'10", "4'11",
+        heightDropdown = new JComboBox<>(new String[] { "4'10", "4'11",
         "5'0", "5'1", "5'2", "5'3", "5'4", "5'5", "5'6", "5'7", "5'8", "5'9",
         "5'10", "5'11",
         "6'0", "6'1", "6'2", "6'3", "6'4", "6'5", "6'6", "6'7", "6'8", "6'9",
@@ -74,38 +118,48 @@ class tdeeCalculator{
         heightDropdown.setBounds(200, 225, 100, 30); // Adjust the bounds as needed
         frame.add(heightDropdown);
 
-        // activity levl label
+        // activity level label
         JLabel activityLevel = new JLabel("Activity Level:");
         activityLevel.setBounds(100, 250, 100, 80);
         frame.add(activityLevel);
 
-        // height comboBox
-        JComboBox<String> activityLevelDropdown = new JComboBox<>(new String[] { "Sedentary (office job)", "Light Exercise (1-2 days/weeks)", "Moderate Exercise (3-5 days/weeks)", "Heavy Exercise (6-7 days/weeks)", "Athlete (2x per day)" });
+        // activityLevel comboBox
+        activityLevelDropdown = new JComboBox<>(new String[] { "Sedentary (office job)", "Light Exercise (1-2 days/weeks)", "Moderate Exercise (3-5 days/weeks)", "Heavy Exercise (6-7 days/weeks)", "Athlete (2x per day)" });
         activityLevelDropdown.setBounds(200, 275, 220, 30); // Adjust the bounds as needed
         frame.add(activityLevelDropdown);
 
-         // goal label
-         JLabel goal = new JLabel("Goal:");
-         goal.setBounds(100, 300, 50, 80);
-         frame.add(goal);
- 
-         // goal checkbox
-         CheckboxGroup goalcbg = new CheckboxGroup();
+        // goal label
+        JLabel goal = new JLabel("Goal:");
+        goal.setBounds(100, 300, 50, 80);
+        frame.add(goal);
 
-         Checkbox cuttingCheckbox = new Checkbox("Cutting", goalcbg, false);
-         cuttingCheckbox.setBounds(200,325,75,30);
- 
-         Checkbox bulkingCheckbox = new Checkbox("Bulking", goalcbg, false);
-         bulkingCheckbox.setBounds(275,325,100,30);
-         
-         frame.add(cuttingCheckbox);
-         frame.add(bulkingCheckbox);
+        // goal checkbox
+        CheckboxGroup goalcbg = new CheckboxGroup();
+
+        cuttingCheckbox = new Checkbox("Cutting", goalcbg, false);
+        cuttingCheckbox.setBounds(200,325,75,30);
+
+        bulkingCheckbox = new Checkbox("Bulking", goalcbg, false);
+        bulkingCheckbox.setBounds(275,325,100,30);
+        
+        frame.add(cuttingCheckbox);
+        frame.add(bulkingCheckbox);
         
 
 
         // calculate button
         JButton button = new JButton("Calculate");
         button.setBounds(150,380,200,50);
+
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                int bmr = calculateBMR();
+
+                System.out.println(bmr);
+            }
+        });
+
         frame.add(button);
 
         // GUI
