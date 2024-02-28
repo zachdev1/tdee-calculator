@@ -1,12 +1,10 @@
-import java.io.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 /*
- * TODO: output BMR and TDEE to GUI
+ * BUG: RESIZE GUI TO VIEW BMR AND CALORIE GOAL 
  */
 
 class tdeeCalculator{
@@ -17,7 +15,9 @@ class tdeeCalculator{
     private static JComboBox<String> heightDropdown;
     private static JComboBox<String> activityLevelDropdown;
     private static Checkbox cuttingCheckbox;
-    private static Checkbox bulkingCheckbox; 
+    private static Checkbox bulkingCheckbox;
+    private static JLabel bmrLabel;
+    private static JLabel kcalsLabel;
 
 
     public static int calculateBMR(){
@@ -195,21 +195,36 @@ class tdeeCalculator{
             @Override
             public void actionPerformed(ActionEvent e){
                 int bmr = calculateBMR();
-                int tdee = calculateTDEE();
                 int kcals = deficitOrSurplus();
 
-                // DEBUG
-                System.out.println(bmr);
-                System.out.println(tdee);
-                System.out.println(kcals);
+
+                // Create or update JLabels with the calculated values
+                if(bmrLabel == null){
+                    bmrLabel = new JLabel("BMR: " + bmr);
+                    bmrLabel.setBounds(150, 450, 200, 30);
+                    bmrLabel.setFont(new Font("Verdana", Font.BOLD, 15));
+                    frame.add(bmrLabel);
+                } else{
+                    bmrLabel.setText("BMR: " + bmr);
+                }
+
+                if(kcalsLabel == null){
+                    kcalsLabel = new JLabel("Calorie Goal: " + kcals);
+                    kcalsLabel.setBounds(150, 510, 200, 30);
+                    kcalsLabel.setFont(new Font("Verdana", Font.BOLD, 15));
+                    frame.add(kcalsLabel);
+                } else{
+                    kcalsLabel.setText("Calorie Goal: " + kcals);
+                }
             }
         });
 
         frame.add(button);
 
         // GUI
-        frame.setSize(500,600);
+        frame.setSize(600,600);
         frame.setLayout(null);
         frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
